@@ -27,6 +27,8 @@ class WeatherApp(QWidget):
         vbox.addWidget(self.emoji_label)
         vbox.addWidget(self.description)
 
+        self.setLayout(vbox)
+
         self.city_label.setAlignment(Qt.AlignCenter)
         self.city_box.setAlignment(Qt.AlignCenter)
         self.temperature_label.setAlignment(Qt.AlignCenter)
