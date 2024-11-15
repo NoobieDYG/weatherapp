@@ -6,6 +6,12 @@ from PyQt5.QtCore import Qt
 class WeatherApp(QWidget):
     def __init__(self):
         super().__init__()
+        self.city_label=QLabel("Enter City Name: ",self)
+        self.city_box=QLineEdit(self)
+        self.getweather=QPushButton("Get Weather",self)
+        self.temperature_label=QLabel("70F",self)
+        self.emoji_label=QLabel(" emo ",self)
+        self.description=QLabel("Sunny",self)
 
 
 if __name__=="__main__":
