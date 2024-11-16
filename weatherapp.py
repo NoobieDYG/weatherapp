@@ -14,6 +14,7 @@ class WeatherApp(QWidget):
         self.description=QLabel("Sunny",self)
         self.initUI()
 
+        self.get_weather_button.clicked.connect(self.get_weather)
 
     def initUI(self):
         self.setWindowTitle("Weather APP")
@@ -68,6 +69,8 @@ class WeatherApp(QWidget):
             }
         """)
 
+    def get_weather(self):
+        print("Weahter ")
 
 
 
