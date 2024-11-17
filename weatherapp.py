@@ -9,9 +9,10 @@ class WeatherApp(QWidget):
         self.city_label=QLabel("Enter City Name: ",self)
         self.city_box=QLineEdit(self)
         self.getweather=QPushButton("Get Weather",self)
-        self.temperature_label=QLabel("70F",self)
-        self.emoji_label=QLabel(" ☀️ ",self)
-        self.description=QLabel("Sunny",self)
+        self.temperature_label=QLabel(" ",self)
+        self.emoji_label=QLabel(" ",self)
+        self.description=QLabel(" ",self)
+        self.feelslike=QLabel(" ",self)
         self.initUI()
 
         self.getweather.clicked.connect(self.get_weather)
@@ -25,8 +26,10 @@ class WeatherApp(QWidget):
         vbox.addWidget(self.city_box)
         vbox.addWidget(self.getweather)
         vbox.addWidget(self.temperature_label)
+        vbox.addWidget(self.feelslike)
         vbox.addWidget(self.emoji_label)
         vbox.addWidget(self.description)
+        
 
         self.setLayout(vbox)
 
@@ -35,14 +38,17 @@ class WeatherApp(QWidget):
         self.temperature_label.setAlignment(Qt.AlignCenter)
         self.emoji_label.setAlignment(Qt.AlignCenter)
         self.description.setAlignment(Qt.AlignCenter)
+        self.feelslike.setAlignment(Qt.AlignCenter)
 
 
         self.city_label.setObjectName('city_label')
         self.city_box.setObjectName('city_box')
         self.temperature_label.setObjectName('temperature_label')
+        self.feelslike.setObjectName("feelslike")
         self.emoji_label.setObjectName('emoji_label')
         self.description.setObjectName('description')
         self.getweather.setObjectName('getweather')
+        
 
 
         self.setStyleSheet("""
@@ -61,15 +67,15 @@ class WeatherApp(QWidget):
                 font-weight: bold;
             }
             QLabel#temperature_label {
-                font-size: 75px;
+                font-size: 50px;
             }
             QLabel#description{
                 font-size: 50px;
                                
             }
             QLabel#emoji_label{
-                font-size: 100px;
-                font-family: Segoe UI emoji;                   
+                font-size: 50px;
+                font-family: Segoe UI Emoji;                   
             }
         """)
 
@@ -90,27 +96,60 @@ class WeatherApp(QWidget):
         except requests.exceptions.HTTPError:
             match response.status_code:
                 case 400:
-                    print("Bad request\nPlease check input")
+                    self.display_error("Bad request\nPlease check input")
                 case 401:
-                    print("Unauthorized\nCheck Key")
+                    self.display_error("Unauthorized\nCheck Key")
                 case 403:
-                    print ("Access Denied\nOops")
+                    self.display_error("Access Denied\nOops")
                 case 404:
-                    print("Not Found\nWrong Input")
+                    self.display_error("Not Found\nWrong Input")
                 case 500:
-                    print("Server Error\n")
+                    self.display_error("Server Error\n")
                 case 502:
-                    print("Bad Gateway\nOops")
+                    self.display_error("Bad Gateway\nOops")
 
         except requests.exceptions.RequestException as reqerror:
-            print(f'Request error:\n{reqerror}')
+            self.display_error(f'Request error:\n{reqerror}')
 
 
     def display_error(self,msg):
-        pass
+        self.temperature_label.clear()
+        self.feelslike.clear()
+        self.description.clear()
+        self.emoji_label.clear()
+        self.temperature_label.setText(msg)
     
     def display_weather(self,data):
-        print(data)
+        #first displaying the temperature
+        tempk=data['main']['temp']
+        tempc=tempk-273.15
+        self.temperature_label.setStyleSheet("font-size: 45px")
+        self.temperature_label.setText(f"Temperature: {round(tempc,1)} C")
+        #now displaying description
+        descr=data['weather'][0]['description']
+        self.description.setText(descr)
+        self.description.setStyleSheet("font-size: 50px")
+        #feels like
+        feel=data['main']['feels_like']
+        feel_in_C=feel-273.15
+        self.feelslike.setStyleSheet("font-size: 45px")
+        self.feelslike.setText(f"Feels Like: {round(feel_in_C,1)}")
+        #emoji
+        weather_id=data['weather'][0]['id']
+        self.emoji_label.setText(self.weather_emoji(weather_id))
+    @staticmethod
+    def weather_emoji(weather_id):
+        if weather_id>=200 and weather_id <=232:
+            return "🌩️"
+        elif 300<=weather_id<=321:
+            return '⛅'
+        elif 500<=weather_id<=531:
+            return '🌧️'
+        elif 600<=weather_id<=632:
+            return '❄️'
+        elif 701<=weather_id<=741:
+            return '🌫️'
+        
 
 
 if __name__=="__main__":
